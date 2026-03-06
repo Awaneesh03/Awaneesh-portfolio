@@ -1,0 +1,7 @@
+{
+  "name": "MacOS Web Experience",
+  "description": "A high-fidelity simulation of the macOS boot sequence, login screen, and desktop environment featuring interactive widgets and a functional dock.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
