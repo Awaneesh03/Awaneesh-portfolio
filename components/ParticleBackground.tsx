@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
 
 interface ParticleBackgroundProps {
   count?: number;
@@ -17,9 +16,10 @@ interface Particle {
   moveY: number;
 }
 
-export const ParticleBackground: React.FC<ParticleBackgroundProps> = ({ 
-  count = 50, 
-  color = 'rgba(255, 255, 255, 0.4)' 
+// Lightweight CSS-only particles instead of framer-motion animated divs
+export const ParticleBackground: React.FC<ParticleBackgroundProps> = ({
+  count = 15,
+  color = 'rgba(255, 255, 255, 0.3)'
 }) => {
   const particles = useMemo<Particle[]>(() => {
     return Array.from({ length: count }, (_, i) => ({
@@ -27,17 +27,17 @@ export const ParticleBackground: React.FC<ParticleBackgroundProps> = ({
       x: Math.random() * 100,
       y: Math.random() * 100,
       size: Math.random() * 3 + 1,
-      duration: Math.random() * 20 + 20,
+      duration: Math.random() * 20 + 25,
       delay: Math.random() * 10,
-      moveX: (Math.random() - 0.5) * 50,
-      moveY: (Math.random() - 0.5) * 50,
+      moveX: (Math.random() - 0.5) * 40,
+      moveY: (Math.random() - 0.5) * 40,
     }));
   }, [count]);
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {particles.map((particle) => (
-        <motion.div
+        <div
           key={particle.id}
           className="absolute rounded-full"
           style={{
@@ -46,90 +46,41 @@ export const ParticleBackground: React.FC<ParticleBackgroundProps> = ({
             width: particle.size,
             height: particle.size,
             background: color,
-            filter: particle.size > 2 ? 'blur(1px)' : 'none',
-          }}
-          animate={{
-            x: [0, particle.moveX, 0],
-            y: [0, particle.moveY, 0],
-            opacity: [0, 0.6, 0],
-            scale: [0.5, 1, 0.5],
-          }}
-          transition={{
-            duration: particle.duration,
-            delay: particle.delay,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
+            opacity: 0.4,
+            animation: `particle-drift ${particle.duration}s ease-in-out ${particle.delay}s infinite`,
+            '--drift-x': `${particle.moveX}px`,
+            '--drift-y': `${particle.moveY}px`,
+          } as React.CSSProperties}
         />
       ))}
     </div>
   );
 };
 
-// Animated gradient orbs for added visual depth
+// Simple CSS gradient orbs — no framer-motion, just CSS animations
 export const GradientOrbs: React.FC = () => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Purple orb */}
-      <motion.div
-        className="absolute w-[600px] h-[600px] rounded-full opacity-20"
+      <div
+        className="absolute w-[500px] h-[500px] rounded-full opacity-15"
         style={{
-          background: 'radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, transparent 70%)',
           left: '-10%',
           top: '10%',
           filter: 'blur(60px)',
-        }}
-        animate={{
-          x: [0, 50, 0],
-          y: [0, 30, 0],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 15,
-          repeat: Infinity,
-          ease: 'easeInOut',
+          animation: 'orb-float-1 20s ease-in-out infinite',
+          willChange: 'transform',
         }}
       />
-      
-      {/* Blue orb */}
-      <motion.div
-        className="absolute w-[500px] h-[500px] rounded-full opacity-20"
+      <div
+        className="absolute w-[400px] h-[400px] rounded-full opacity-15"
         style={{
-          background: 'radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%)',
           right: '-5%',
           bottom: '10%',
           filter: 'blur(60px)',
-        }}
-        animate={{
-          x: [0, -40, 0],
-          y: [0, -50, 0],
-          scale: [1, 1.15, 1],
-        }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      />
-      
-      {/* Cyan orb */}
-      <motion.div
-        className="absolute w-[400px] h-[400px] rounded-full opacity-15"
-        style={{
-          background: 'radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, transparent 70%)',
-          right: '30%',
-          top: '-5%',
-          filter: 'blur(50px)',
-        }}
-        animate={{
-          x: [0, 30, 0],
-          y: [0, 40, 0],
-          scale: [1, 1.2, 1],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: 'easeInOut',
+          animation: 'orb-float-2 25s ease-in-out infinite',
+          willChange: 'transform',
         }}
       />
     </div>

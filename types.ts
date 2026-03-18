@@ -1,3 +1,4 @@
+import React from 'react';
 
 export type SystemPhase = 'boot-splash' | 'boot-progress' | 'login' | 'desktop';
 
