@@ -4,12 +4,19 @@ import {
     Users, GitBranch, Star, MapPin, Calendar, Link2, Mail, Briefcase, Image, Grid3X3,
     Play, ChevronDown, ThumbsUp, Send, Plus, Settings, User, Globe, Code2
 } from 'lucide-react';
-import { PORTFOLIO, GITHUB_USERNAME } from '../../data/social';
+const GITHUB_USERNAME = "Awaneesh03";
+const PORTFOLIO = {
+  name: "Awaneesh",
+  title: "Full Stack Developer",
+  email: "kg3327949@gmail.com",
+  github: "https://github.com/Awaneesh03",
+};
+
 
 /* ═══════════════════════════════════════════════════════════════════ */
 /*  GITHUB SIMULATION                                                 */
 /* ═══════════════════════════════════════════════════════════════════ */
-export const SimulatedGitHub: React.FC<{ username?: string }> = ({ username = GITHUB_USERNAME }) => {
+export const SimulatedGitHub: React.FC<{ username?: string; query?: string }> = ({ username = GITHUB_USERNAME }) => {
     const [activeTab, setActiveTab] = useState('repositories');
 
     const repos = [
@@ -130,7 +137,7 @@ export const SimulatedGitHub: React.FC<{ username?: string }> = ({ username = GI
 /* ═══════════════════════════════════════════════════════════════════ */
 /*  LINKEDIN SIMULATION                                               */
 /* ═══════════════════════════════════════════════════════════════════ */
-export const SimulatedLinkedIn: React.FC = () => {
+export const SimulatedLinkedIn: React.FC<{ query?: string }> = () => {
     const [activeTab, setActiveTab] = useState('posts');
 
     const posts = [
@@ -243,7 +250,7 @@ export const SimulatedLinkedIn: React.FC = () => {
 /* ═══════════════════════════════════════════════════════════════════ */
 /*  INSTAGRAM SIMULATION                                              */
 /* ═══════════════════════════════════════════════════════════════════ */
-export const SimulatedInstagram: React.FC = () => {
+export const SimulatedInstagram: React.FC<{ query?: string }> = () => {
     // Generate placeholder grid images with gradients
     const posts = Array.from({ length: 9 }, (_, i) => ({
         id: i,
@@ -339,7 +346,7 @@ export const SimulatedInstagram: React.FC = () => {
 /* ═══════════════════════════════════════════════════════════════════ */
 /*  TWITTER/X SIMULATION                                              */
 /* ═══════════════════════════════════════════════════════════════════ */
-export const SimulatedTwitter: React.FC = () => {
+export const SimulatedTwitter: React.FC<{ query?: string }> = () => {
     const tweets = [
         { text: "Just shipped my macOS portfolio 🚀 Complete with a working browser, terminal, and dock animations. Built with React + TypeScript. Check it out!", time: '2h', likes: 24, retweets: 5, replies: 3 },
         { text: "TIL: The key to great portfolio sites isn't showing what you know — it's showing what you can BUILD. Actions > words. 💡 #100DaysOfCode", time: '1d', likes: 89, retweets: 12, replies: 7 },
@@ -431,39 +438,155 @@ export const SimulatedTwitter: React.FC = () => {
 /* ═══════════════════════════════════════════════════════════════════ */
 /*  GOOGLE SIMULATION                                                 */
 /* ═══════════════════════════════════════════════════════════════════ */
-export const SimulatedGoogle: React.FC<{ onSearch: (q: string) => void }> = ({ onSearch }) => {
-    const [query, setQuery] = useState('');
+export const SimulatedGoogle: React.FC<{ query?: string }> = ({ query: initialQuery = '' }) => {
+    const [inputValue, setInputValue] = useState(initialQuery);
+    const [activeQuery, setActiveQuery] = useState(initialQuery);
 
-    return (
-        <div className="w-full h-full bg-[#202124] text-white flex flex-col items-center justify-center">
-            <div className="flex flex-col items-center -mt-20">
-                {/* Google Logo */}
-                <div className="text-[92px] font-normal mb-8 select-none" style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>
-                    <span style={{ color: '#4285f4' }}>G</span>
-                    <span style={{ color: '#ea4335' }}>o</span>
-                    <span style={{ color: '#fbbc05' }}>o</span>
-                    <span style={{ color: '#4285f4' }}>g</span>
-                    <span style={{ color: '#34a853' }}>l</span>
-                    <span style={{ color: '#ea4335' }}>e</span>
+    // When prop changes (browser navigated with new search), sync state
+    React.useEffect(() => {
+        setInputValue(initialQuery);
+        setActiveQuery(initialQuery);
+    }, [initialQuery]);
+
+    const handleSearch = () => {
+        const q = inputValue.trim();
+        if (q) setActiveQuery(q);
+    };
+
+    const fakeResults = activeQuery ? [
+        {
+            title: `${activeQuery} - Wikipedia`,
+            url: 'https://en.wikipedia.org/wiki/' + encodeURIComponent(activeQuery),
+            snippet: `${activeQuery} is a topic with rich history and detailed information. Wikipedia provides comprehensive coverage including background, history, and related concepts.`,
+        },
+        {
+            title: `${activeQuery} - GeeksforGeeks`,
+            url: 'https://www.geeksforgeeks.org/search/?q=' + encodeURIComponent(activeQuery),
+            snippet: `Learn about ${activeQuery} with examples, tutorials, and practice problems. GeeksforGeeks is a computer science portal for geeks.`,
+        },
+        {
+            title: `${activeQuery} Tutorial - MDN Web Docs`,
+            url: 'https://developer.mozilla.org/en-US/search?q=' + encodeURIComponent(activeQuery),
+            snippet: `MDN Web Docs provides comprehensive documentation and tutorials for ${activeQuery}. Find examples, reference docs, and guides.`,
+        },
+        {
+            title: `${activeQuery} - Stack Overflow`,
+            url: 'https://stackoverflow.com/search?q=' + encodeURIComponent(activeQuery),
+            snippet: `Questions and answers about ${activeQuery} on Stack Overflow. Find solutions to common problems and connect with developers.`,
+        },
+        {
+            title: `${activeQuery} - YouTube`,
+            url: 'https://www.youtube.com/results?search_query=' + encodeURIComponent(activeQuery),
+            snippet: `Watch videos about ${activeQuery} on YouTube. Tutorials, explanations, and demonstrations from content creators worldwide.`,
+        },
+        {
+            title: `${activeQuery} — GitHub Search`,
+            url: 'https://github.com/search?q=' + encodeURIComponent(activeQuery),
+            snippet: `Search code, repositories, and projects related to ${activeQuery} on GitHub. Millions of developers build with GitHub.`,
+        },
+    ] : [];
+
+    if (!activeQuery) {
+        // Homepage
+        return (
+            <div className="w-full h-full bg-[#202124] text-white flex flex-col items-center justify-center">
+                <div className="flex flex-col items-center -mt-20">
+                    <div className="text-[92px] font-normal mb-8 select-none">
+                        <span style={{ color: '#4285f4' }}>G</span>
+                        <span style={{ color: '#ea4335' }}>o</span>
+                        <span style={{ color: '#fbbc05' }}>o</span>
+                        <span style={{ color: '#4285f4' }}>g</span>
+                        <span style={{ color: '#34a853' }}>l</span>
+                        <span style={{ color: '#ea4335' }}>e</span>
+                    </div>
+                    <div className="w-[580px] max-w-[90vw]">
+                        <div className="bg-[#303134] rounded-full flex items-center px-5 py-3 border border-[#5f6368] focus-within:border-[#8e918f] transition-all shadow-lg">
+                            <Search size={18} className="text-[#9aa0a6] mr-3 flex-shrink-0" />
+                            <input
+                                type="text"
+                                className="flex-1 bg-transparent outline-none text-white text-base"
+                                placeholder="Search Google"
+                                value={inputValue}
+                                onChange={e => setInputValue(e.target.value)}
+                                onKeyDown={e => { if (e.key === 'Enter') handleSearch(); }}
+                                autoFocus
+                            />
+                        </div>
+                        <div className="flex justify-center gap-3 mt-8">
+                            <button onClick={handleSearch} className="px-4 py-2 bg-[#303134] text-[#e8eaed] rounded text-sm hover:border-[#5f6368] border border-transparent hover:bg-[#3c3c3c]">Google Search</button>
+                            <button onClick={handleSearch} className="px-4 py-2 bg-[#303134] text-[#e8eaed] rounded text-sm hover:border-[#5f6368] border border-transparent hover:bg-[#3c3c3c]">I'm Feeling Lucky</button>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        );
+    }
 
-                {/* Search Bar */}
-                <div className="w-[580px] max-w-[90%]">
-                    <div className="bg-[#303134] rounded-full flex items-center px-5 py-3 border border-[#5f6368] hover:border-[#8e918f] hover:bg-[#303134] focus-within:bg-[#303134] focus-within:border-[#8e918f] transition-all shadow-lg">
-                        <Search size={18} className="text-[#9aa0a6] mr-3" />
+    // Search results page
+    return (
+        <div className="w-full h-full bg-[#202124] text-white overflow-y-auto custom-scrollbar">
+            {/* Header */}
+            <div className="bg-[#202124] border-b border-[#3c4043] px-6 py-3 sticky top-0 z-10">
+                <div className="flex items-center gap-4">
+                    <div className="text-2xl font-bold select-none cursor-pointer" onClick={() => setActiveQuery('')}>
+                        <span style={{ color: '#4285f4' }}>G</span>
+                        <span style={{ color: '#ea4335' }}>o</span>
+                        <span style={{ color: '#fbbc05' }}>o</span>
+                        <span style={{ color: '#4285f4' }}>g</span>
+                        <span style={{ color: '#34a853' }}>l</span>
+                        <span style={{ color: '#ea4335' }}>e</span>
+                    </div>
+                    <div className="flex-1 max-w-xl bg-[#303134] rounded-full flex items-center px-4 py-2 border border-[#5f6368] focus-within:border-blue-400 transition-colors">
                         <input
                             type="text"
-                            className="flex-1 bg-transparent outline-none text-white text-base"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            onKeyDown={(e) => { if (e.key === 'Enter' && query.trim()) onSearch(query.trim()); }}
-                            autoFocus
+                            className="flex-1 bg-transparent outline-none text-white text-sm"
+                            value={inputValue}
+                            onChange={e => setInputValue(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') handleSearch(); }}
                         />
+                        <Search size={16} className="text-[#9aa0a6] ml-2 flex-shrink-0 cursor-pointer" onClick={handleSearch} />
                     </div>
-                    <div className="flex justify-center gap-3 mt-8">
-                        <button onClick={() => query.trim() && onSearch(query.trim())} className="px-4 py-2 bg-[#303134] text-[#e8eaed] rounded text-sm hover:border hover:border-[#5f6368] border border-transparent">Google Search</button>
-                        <button className="px-4 py-2 bg-[#303134] text-[#e8eaed] rounded text-sm hover:border hover:border-[#5f6368] border border-transparent">I'm Feeling Lucky</button>
-                    </div>
+                </div>
+                <div className="flex gap-6 mt-2 ml-28 text-sm">
+                    {['All', 'Images', 'Videos', 'News', 'Shopping'].map((tab, i) => (
+                        <button key={tab} className={`pb-2 border-b-2 ${i === 0 ? 'border-blue-400 text-blue-400' : 'border-transparent text-[#9aa0a6] hover:text-white'}`}>{tab}</button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Results */}
+            <div className="max-w-2xl px-6 py-4 ml-24">
+                <p className="text-[#9aa0a6] text-sm mb-4">About {(Math.random() * 900 + 100).toFixed(0)} million results</p>
+                <div className="space-y-6">
+                    {fakeResults.map((result, i) => (
+                        <div key={i} className="group">
+                            <div className="text-xs text-[#9aa0a6] mb-0.5 truncate">{result.url}</div>
+                            <a
+                                href={result.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xl text-[#8ab4f8] group-hover:underline cursor-pointer block mb-1"
+                            >
+                                {result.title}
+                            </a>
+                            <p className="text-sm text-[#bdc1c6] leading-relaxed">{result.snippet}</p>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Pagination */}
+                <div className="flex items-center justify-center gap-2 mt-12 mb-8">
+                    <span className="text-2xl font-bold mr-2">
+                        <span style={{ color: '#4285f4' }}>G</span>
+                        <span style={{ color: '#ea4335' }}>o</span>
+                        <span style={{ color: '#fbbc05' }}>o</span>
+                        <span style={{ color: '#4285f4' }}>g</span>
+                        <span style={{ color: '#34a853' }}>l</span>
+                        <span style={{ color: '#ea4335' }}>e</span>
+                    </span>
+                    {[1,2,3,4,5].map(n => (
+                        <button key={n} className={`w-8 h-8 rounded-full text-sm ${n === 1 ? 'text-white bg-blue-600' : 'text-[#8ab4f8] hover:bg-[#303134]'}`}>{n}</button>
+                    ))}
                 </div>
             </div>
         </div>
