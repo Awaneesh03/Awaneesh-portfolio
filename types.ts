@@ -62,3 +62,18 @@ export interface TerminalCommand {
   command: string;
   output: string | React.ReactNode;
 }
+
+// Browser types — see data/index.ts for BrowserSite
+export type BrowserView = 'newtab' | 'youtube-player' | 'simulated' | 'blocked' | 'iframe';
+
+export interface BrowserTab {
+  id: string;
+  url: string;
+  displayUrl: string;
+  title: string;
+  history: string[];
+  historyIndex: number;
+  isLoading: boolean;
+  favicon: string | null;
+}
+
