@@ -150,7 +150,7 @@ export const TerminalApp: React.FC = () => {
       case 'experience':
         return (
           <div className="space-y-2">
-            <p className="text-blue-400 mb-2">🗓️ {getYearsOfExperience()} year of building projects</p>
+            <p className="text-blue-400 mb-2">🗓️ {getYearsOfExperience()}+ years of building projects</p>
             {timeline.filter(t => t.type === 'work').map((exp, i) => (
               <div key={i} className="border-l-2 border-green-500/50 pl-3">
                 <p className="text-green-400">{exp.startDate} - {exp.endDate || 'Present'}</p>

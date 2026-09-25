@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  GraduationCap, Briefcase, Award, Calendar,
-  ChevronLeft, ChevronRight, MapPin
+  GraduationCap, Briefcase, Award, Calendar, Rocket,
+  ChevronLeft, ChevronRight, ExternalLink
 } from 'lucide-react';
-import { PORTFOLIO } from '../../constants';
+import { getFullTimeline, formatTimelineDate } from '../../data/experience';
 
 export const ExperienceApp: React.FC = () => {
-  const [filter, setFilter] = useState<'all' | 'education' | 'work' | 'achievement'>('all');
+  const [filter, setFilter] = useState<'all' | 'education' | 'work' | 'project' | 'achievement'>('all');
   
-  const timeline = PORTFOLIO.timeline;
+  const timeline = getFullTimeline();
+  const firstYear = timeline[timeline.length - 1]?.startDate.slice(0, 4);
+  const period = (start: string, end: string) =>
+    start === end ? formatTimelineDate(start) : `${formatTimelineDate(start)} – ${formatTimelineDate(end)}`;
   
   const filteredTimeline = timeline.filter(item => 
     filter === 'all' || item.type === filter
@@ -20,6 +23,7 @@ export const ExperienceApp: React.FC = () => {
       case 'education': return GraduationCap;
       case 'work': return Briefcase;
       case 'achievement': return Award;
+      case 'project': return Rocket;
       default: return Calendar;
     }
   };
@@ -29,6 +33,7 @@ export const ExperienceApp: React.FC = () => {
       case 'education': return 'from-blue-500 to-cyan-500';
       case 'work': return 'from-green-500 to-emerald-500';
       case 'achievement': return 'from-yellow-500 to-orange-500';
+      case 'project': return 'from-purple-500 to-pink-500';
       default: return 'from-gray-500 to-gray-600';
     }
   };
@@ -38,6 +43,7 @@ export const ExperienceApp: React.FC = () => {
       case 'education': return 'border-blue-500/50';
       case 'work': return 'border-green-500/50';
       case 'achievement': return 'border-yellow-500/50';
+      case 'project': return 'border-purple-500/50';
       default: return 'border-gray-500/50';
     }
   };
@@ -56,7 +62,7 @@ export const ExperienceApp: React.FC = () => {
             <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
               <ChevronLeft size={20} />
             </button>
-            <span className="text-sm font-medium">2020 - Present</span>
+            <span className="text-sm font-medium">{firstYear} - Present</span>
             <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
               <ChevronRight size={20} />
             </button>
@@ -69,6 +75,7 @@ export const ExperienceApp: React.FC = () => {
             { id: 'all', label: 'All', icon: Calendar },
             { id: 'education', label: 'Education', icon: GraduationCap },
             { id: 'work', label: 'Work', icon: Briefcase },
+            { id: 'project', label: 'Projects', icon: Rocket },
             { id: 'achievement', label: 'Achievements', icon: Award },
           ].map((item) => (
             <button
@@ -99,7 +106,7 @@ export const ExperienceApp: React.FC = () => {
                 const Icon = getIcon(item.type);
                 return (
                   <motion.div
-                    key={`${item.year}-${item.title}`}
+                    key={item.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
@@ -118,14 +125,23 @@ export const ExperienceApp: React.FC = () => {
                           <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium mb-2 ${
                             item.type === 'education' ? 'bg-blue-500/20 text-blue-400' :
                             item.type === 'work' ? 'bg-green-500/20 text-green-400' :
+                            item.type === 'project' ? 'bg-purple-500/20 text-purple-400' :
                             'bg-yellow-500/20 text-yellow-400'
                           }`}>
                             {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
                           </span>
-                          <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+                          <h3 className="text-lg font-semibold text-white">
+                            {item.link ? (
+                              <a href={item.link} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 inline-flex items-center gap-1.5">
+                                {item.title}
+                                <ExternalLink size={14} className="text-white/40" />
+                              </a>
+                            ) : item.title}
+                          </h3>
+                          <p className="text-white/50 text-sm">{item.organization}</p>
                         </div>
-                        <span className="text-white/40 text-sm font-mono bg-white/5 px-2 py-1 rounded">
-                          {item.year}
+                        <span className="text-white/40 text-sm font-mono bg-white/5 px-2 py-1 rounded whitespace-nowrap ml-3">
+                          {period(item.startDate, item.endDate)}
                         </span>
                       </div>
                       
@@ -161,6 +177,12 @@ export const ExperienceApp: React.FC = () => {
               {timeline.filter(t => t.type === 'work').length}
             </div>
             <div className="text-xs text-white/50">Work</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xl font-bold text-purple-400">
+              {timeline.filter(t => t.type === 'project').length}
+            </div>
+            <div className="text-xs text-white/50">Projects</div>
           </div>
           <div className="text-center">
             <div className="text-xl font-bold text-yellow-400">
