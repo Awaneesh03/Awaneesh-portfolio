@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, User, Briefcase, Code, Mail, ExternalLink, FileText, Github, Linkedin } from 'lucide-react';
 import { PORTFOLIO } from '../constants';
+import { featuredProjects } from '../data/projects';
+import { skillCategories } from '../data/skills';
 
 interface SpotlightProps {
   isOpen: boolean;
@@ -71,7 +73,7 @@ export const Spotlight: React.FC<SpotlightProps> = ({ isOpen, onClose, onOpenApp
       title: 'GitHub Profile',
       category: 'Links',
       icon: <Github size={18} className="text-white" />,
-      action: () => { window.open(`https://github.com/${PORTFOLIO.github}`, '_blank'); onClose(); },
+      action: () => { window.open(PORTFOLIO.github, '_blank'); onClose(); },
     },
     {
       id: 'linkedin',
@@ -88,7 +90,7 @@ export const Spotlight: React.FC<SpotlightProps> = ({ isOpen, onClose, onOpenApp
       action: () => { window.open(PORTFOLIO.resume, '_blank'); onClose(); },
     },
     // Add projects as searchable
-    ...PORTFOLIO.projects.map(project => ({
+    ...featuredProjects.map(project => ({
       id: `project-${project.id}`,
       title: project.name,
       category: 'Projects',
@@ -100,11 +102,11 @@ export const Spotlight: React.FC<SpotlightProps> = ({ isOpen, onClose, onOpenApp
       },
     })),
     // Add skills as searchable
-    ...Object.entries(PORTFOLIO.skills).flatMap(([category, skills]) =>
-      (skills as string[]).map(skill => ({
-        id: `skill-${skill}`,
-        title: skill,
-        category: `Skills - ${category.charAt(0).toUpperCase() + category.slice(1)}`,
+    ...skillCategories.flatMap(category =>
+      category.skills.map(skill => ({
+        id: `skill-${skill.name}`,
+        title: skill.name,
+        category: `Skills - ${category.name}`,
         icon: <Code size={18} className="text-emerald-400" />,
         action: () => { onOpenApp('skills'); onClose(); },
       }))

@@ -5,18 +5,26 @@ import {
   Grid3X3, List, RefreshCw, Sparkles, CheckCircle, 
   Rocket, Server, Globe, ArrowRight, Code2, Zap
 } from 'lucide-react';
-import { featuredProjects, startupProject, FeaturedProject } from '../../data/projects';
+import { featuredProjects, buildProjects, FeaturedProject } from '../../data/projects';
 import { GITHUB_USERNAME } from '../../data/social';
 import { fetchGitHubRepos, GitHubRepo, formatRelativeTime, clearGitHubCache } from '../../services/githubService';
 
 export const ProjectsApp: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filter, setFilter] = useState<'all' | 'featured' | 'web' | 'startup'>('all');
+  const [filter, setFilter] = useState<'all' | 'featured' | 'web' | 'ai' | 'game'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [projects, setProjects] = useState<FeaturedProject[]>(featuredProjects);
   const [githubRepos, setGithubRepos] = useState<GitHubRepo[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'projects' | 'github'>('projects');
   const [selectedProject, setSelectedProject] = useState<FeaturedProject | null>(null);
+
+  // My Projects = live repos + overrides; keeps the offline snapshot if the API fails
+  useEffect(() => {
+    fetchGitHubRepos(GITHUB_USERNAME, { excludeForks: true })
+      .then(repos => setProjects(buildProjects(repos)))
+      .catch(error => console.error('Failed to fetch GitHub repos for projects:', error));
+  }, []);
 
   // Fetch GitHub repos
   useEffect(() => {
@@ -47,17 +55,17 @@ export const ProjectsApp: React.FC = () => {
     loadGitHubRepos();
   };
 
-  // Filter out startup from regular projects list (shown separately)
-  const regularProjects = featuredProjects.filter(p => p.id !== 'motif-startup');
-  
-  const filteredProjects = regularProjects.filter(p => {
+  const visibleProjects = projects.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          p.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filter === 'all' || 
+    const matchesFilter = filter === 'all' ||
                           (filter === 'featured' && p.featured) ||
                           (p.category === filter);
     return matchesSearch && matchesFilter;
   });
+  // Hero projects get the large card; the rest go in the grid
+  const heroProjects = visibleProjects.filter(p => p.hero);
+  const filteredProjects = visibleProjects.filter(p => !p.hero);
 
   const filteredRepos = githubRepos.filter(r => {
     return r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -80,9 +88,9 @@ export const ProjectsApp: React.FC = () => {
   };
 
   // ============================================
-  // FEATURED STARTUP CARD - Prominent Display
+  // HERO PROJECT CARD - Prominent Display
   // ============================================
-  const StartupCard: React.FC = () => (
+  const HeroCard: React.FC<{ project: FeaturedProject }> = ({ project }) => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -95,7 +103,7 @@ export const ProjectsApp: React.FC = () => {
       <div className="absolute top-4 left-4 z-10">
         <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full text-black text-xs font-bold shadow-lg">
           <Rocket size={14} />
-          Featured Startup Project
+          {project.isStartup ? 'Featured Startup Project' : 'Featured Project'}
         </div>
       </div>
 
@@ -104,17 +112,17 @@ export const ProjectsApp: React.FC = () => {
         <div className="space-y-4">
           <div className="aspect-video rounded-xl overflow-hidden border border-white/10 shadow-2xl">
             <img 
-              src={startupProject.image} 
-              alt={startupProject.name}
+              src={project.image} 
+              alt={project.name}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
             />
           </div>
           
           {/* Quick Action Buttons */}
           <div className="flex gap-3">
-            {startupProject.demo && (
+            {project.demo && (
               <a
-                href={startupProject.demo}
+                href={project.demo}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity shadow-lg"
@@ -125,17 +133,17 @@ export const ProjectsApp: React.FC = () => {
               </a>
             )}
             <a
-              href={startupProject.github}
+              href={project.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-white/10 rounded-xl font-medium hover:bg-white/20 transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white/10 rounded-xl font-medium hover:bg-white/20 transition-colors"
             >
               <Github size={18} />
-              Frontend
+              {project.backendRepo ? 'Frontend' : 'View Code'}
             </a>
-            {startupProject.backendRepo && (
+            {project.backendRepo && (
               <a
-                href={startupProject.backendRepo}
+                href={project.backendRepo}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 px-4 py-3 bg-white/10 rounded-xl font-medium hover:bg-white/20 transition-colors"
@@ -151,34 +159,34 @@ export const ProjectsApp: React.FC = () => {
         <div className="space-y-4">
           <div>
             <h2 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
-              {startupProject.name}
+              {project.name}
               <Zap className="text-yellow-400" size={24} />
             </h2>
             <p className="text-white/70 text-lg leading-relaxed">
-              {startupProject.longDescription || startupProject.description}
+              {project.longDescription || project.description}
             </p>
           </div>
 
           {/* Problem Solved */}
-          {startupProject.problemSolved && (
+          {project.problemSolved && (
             <div className="p-4 bg-white/5 rounded-xl border border-white/10">
               <h3 className="text-sm font-semibold text-blue-400 mb-2 flex items-center gap-2">
                 <Code2 size={14} />
                 Problem Solved
               </h3>
-              <p className="text-white/60 text-sm">{startupProject.problemSolved}</p>
+              <p className="text-white/60 text-sm">{project.problemSolved}</p>
             </div>
           )}
 
           {/* Architecture */}
-          {startupProject.architecture && (
+          {project.architecture && (
             <div className="space-y-2">
               <h3 className="text-sm font-semibold text-green-400 flex items-center gap-2">
                 <Server size={14} />
                 Architecture
               </h3>
               <ul className="grid grid-cols-1 gap-1.5">
-                {startupProject.architecture.map((item, i) => (
+                {project.architecture.map((item, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-white/60">
                     <CheckCircle size={14} className="text-green-400 mt-0.5 flex-shrink-0" />
                     {item}
@@ -190,7 +198,7 @@ export const ProjectsApp: React.FC = () => {
 
           {/* Tech Stack */}
           <div className="flex flex-wrap gap-2">
-            {startupProject.technologies.map((tech, i) => (
+            {project.technologies.map((tech, i) => (
               <span 
                 key={i}
                 className="px-3 py-1.5 bg-white/10 rounded-lg text-sm font-medium text-white/80 border border-white/10"
@@ -203,17 +211,17 @@ export const ProjectsApp: React.FC = () => {
       </div>
 
       {/* Bottom highlights bar */}
-      <div className="border-t border-white/10 px-6 py-3 bg-black/20 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          {startupProject.highlights?.map((h, i) => (
+      <div className="border-t border-white/10 px-6 py-3 bg-black/20 flex items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          {project.highlights?.map((h, i) => (
             <span key={i} className="flex items-center gap-1.5 text-xs text-white/50">
               <Sparkles size={12} className="text-yellow-400" />
               {h}
             </span>
           ))}
         </div>
-        <span className="text-xs text-white/40">
-          Status: <span className="text-green-400 font-medium capitalize">{startupProject.status}</span>
+        <span className="text-xs text-white/40 whitespace-nowrap">
+          Status: <span className="text-green-400 font-medium capitalize">{project.status}</span>
         </span>
       </div>
     </motion.div>
@@ -343,7 +351,7 @@ export const ProjectsApp: React.FC = () => {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-4xl">
-            {project.category === 'web' ? '🌐' : project.category === 'ai' ? '🤖' : project.category === 'mobile' ? '📱' : '💻'}
+            {project.category === 'web' ? '🌐' : project.category === 'ai' ? '🤖' : project.category === 'game' ? '🎮' : project.category === 'mobile' ? '📱' : '💻'}
           </div>
         )}
         {project.featured && (
@@ -396,7 +404,7 @@ export const ProjectsApp: React.FC = () => {
             {project.name}
           </h3>
           <span className="text-xs px-2 py-0.5 bg-white/10 rounded-full text-white/60 capitalize">
-            {project.category}
+            {project.category === 'ai' ? 'AI' : project.category}
           </span>
         </div>
         
@@ -535,7 +543,7 @@ export const ProjectsApp: React.FC = () => {
             {activeTab === 'projects' && (
               <>
                 <div className="flex bg-white/5 rounded-lg p-0.5">
-                  {(['all', 'featured', 'startup', 'web'] as const).map(f => (
+                  {(['all', 'featured', 'web', 'ai', 'game'] as const).map(f => (
                     <button
                       key={f}
                       onClick={() => setFilter(f)}
@@ -543,7 +551,7 @@ export const ProjectsApp: React.FC = () => {
                         filter === f ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white/80'
                       }`}
                     >
-                      {f === 'startup' ? '🚀 Startup' : f}
+                      {f === 'ai' ? 'AI' : f}
                     </button>
                   ))}
                 </div>
@@ -594,10 +602,10 @@ export const ProjectsApp: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              {/* Featured Startup Section - Always shown first */}
-              {filter === 'all' || filter === 'startup' || filter === 'featured' ? (
-                <StartupCard />
-              ) : null}
+              {/* Hero Projects - shown first */}
+              {heroProjects.map(project => (
+                <HeroCard key={project.id} project={project} />
+              ))}
 
               {/* Regular Projects Grid */}
               <div className={viewMode === 'grid' 
@@ -611,7 +619,7 @@ export const ProjectsApp: React.FC = () => {
                 ))}
               </div>
               
-              {filteredProjects.length === 0 && filter !== 'startup' && (
+              {visibleProjects.length === 0 && (
                 <div className="text-center py-12 text-white/40">
                   No projects found matching your criteria
                 </div>
@@ -651,22 +659,22 @@ export const ProjectsApp: React.FC = () => {
       <div className="flex-shrink-0 px-6 py-3 border-t border-white/10 bg-[#252525] flex items-center justify-between text-sm text-white/60">
         <span>
           {activeTab === 'projects' 
-            ? `${filteredProjects.length + 1} projects` // +1 for startup
+            ? `${visibleProjects.length} projects`
             : `${filteredRepos.length} repositories`
           }
         </span>
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1">
-            <Star size={14} className="text-yellow-400" />
-            {activeTab === 'github' && filteredRepos.reduce((acc, r) => acc + r.stargazers_count, 0)} stars
-          </span>
-          {activeTab === 'github' && (
+        {activeTab === 'github' && (
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1">
+              <Star size={14} className="text-yellow-400" />
+              {filteredRepos.reduce((acc, r) => acc + r.stargazers_count, 0)} stars
+            </span>
             <span className="flex items-center gap-1">
               <GitFork size={14} className="text-blue-400" />
               {filteredRepos.reduce((acc, r) => acc + r.forks_count, 0)} forks
             </span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Project Preview Modal */}

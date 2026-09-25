@@ -1,7 +1,15 @@
 /**
  * Projects Configuration
- * Real projects from GitHub - Awaneesh03
+ *
+ * The project list is built from the live GitHub repos (see services/githubService.ts),
+ * so a newly pushed public repo shows up automatically using its GitHub description and topics.
+ * `projectOverrides` (keyed by repo name) customises copy/tags/flags per repo, and
+ * `hiddenRepos` keeps repos out of "My Projects" (they still appear in the GitHub Repos tab).
+ * If the GitHub API is unavailable, the overridden repos are shown on their own.
  */
+
+import type { GitHubRepo } from '../services/githubService';
+import { GITHUB_USERNAME } from './social';
 
 export interface FeaturedProject {
   id: string;
@@ -14,214 +22,161 @@ export interface FeaturedProject {
   backendRepo?: string;
   demo?: string;
   featured: boolean;
+  hero?: boolean; // shown as a large card at the top of My Projects
   isStartup?: boolean;
-  category: 'web' | 'mobile' | 'ai' | 'tool' | 'startup' | 'other';
+  category: 'web' | 'mobile' | 'ai' | 'game' | 'tool' | 'startup' | 'other';
   status: 'completed' | 'in-progress' | 'planned';
   highlights?: string[];
   problemSolved?: string;
   architecture?: string[];
+  updatedAt?: string;
 }
 
-// ============================================
-// FEATURED STARTUP - MOTIF
-// ============================================
-export const startupProject: FeaturedProject = {
-  id: "motif-startup",
-  name: "Motif",
-  description: "A full-stack web application built with TypeScript and Java. Modern architecture with separate frontend and backend services.",
-  longDescription: "Motif is a comprehensive web platform featuring a TypeScript-powered frontend with React and a robust Java backend. The project demonstrates proficiency in full-stack development, API design, and deployment on Vercel.",
-  image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop",
-  technologies: ["TypeScript", "React", "Java", "Spring Boot", "REST API", "Vercel"],
-  github: "https://github.com/Awaneesh03/motif-website",
-  backendRepo: "https://github.com/Awaneesh03/motif-backend-",
-  demo: "https://motif-website-master.vercel.app/",
-  featured: true,
-  isStartup: true,
-  category: "startup",
-  status: "completed",
-  problemSolved: "Building a scalable web platform with modern TypeScript frontend and Java backend microservices architecture.",
-  architecture: [
-    "React + TypeScript frontend with component-based architecture",
-    "Java Spring Boot backend with RESTful API design",
-    "Deployed on Vercel for seamless CI/CD",
-    "Clean separation of concerns between frontend and backend"
-  ],
-  highlights: [
-    "Full-stack TypeScript + Java architecture",
-    "Live production deployment on Vercel",
-    "RESTful API integration",
-    "Modern React component design"
-  ]
-};
+const screenshot = (repo: string, path: string) =>
+  `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${repo}/main/${path}`;
 
-// ============================================
-// FEATURED PROJECTS - Real GitHub Repos
-// ============================================
-export const featuredProjects: FeaturedProject[] = [
-  // STARTUP PROJECT - First in list
-  startupProject,
-
-  // MacOS Portfolio
-  {
-    id: "macos-portfolio",
+// Featured entries render in the order they are declared here.
+export const projectOverrides: Record<string, Partial<FeaturedProject>> = {
+  pacify: {
+    name: "Pacify",
+    hero: true,
+    featured: true,
+    category: "game",
+    image: screenshot("pacify", "docs/menu.png"),
+    description: "Browser-based 3D multiplayer hide-and-seek horror game — hunt the Wretch, or survive as it. Play solo against bots or with friends on LAN.",
+    longDescription: "One player is the Wretch, hiding somewhere on the map; everyone else is a Hunter trying to corner it and pacify it before the round timer runs out. No accounts, no installs — just open a link, or pick Solo and play against AI bots in one click.",
+    technologies: ["TypeScript", "Three.js", "Socket.io", "Node.js", "Express", "WebGL", "Vite"],
+    problemSolved: "Real-time multiplayer where client prediction and server truth never drift apart, and a round is always playable even with no friends online.",
+    architecture: [
+      "Authoritative Node.js + Socket.io server steps physics at 20Hz and broadcasts state",
+      "One shared stepPhysics() imported by client and server for prediction",
+      "Three.js scene, player controller, entities and positional audio on the client",
+      "Bots use the same physics and scoring code — only their input is AI-generated",
+    ],
+    highlights: [
+      "Solo mode with AI bots",
+      "Rotating roles & cross-round scoring",
+      "Smoke test plays a real round over a socket",
+    ],
+  },
+  "motif-website": {
+    name: "Motif",
+    hero: true,
+    featured: true,
+    isStartup: true,
+    category: "startup",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop",
+    demo: "https://motif-website.vercel.app",
+    description: "AI-powered platform that helps founders validate startup ideas and connect with VCs through an admin-curated pipeline.",
+    longDescription: "Motif bridges early-stage founders and venture capitalists. Founders submit ideas and get AI feedback, admins vet submissions, and VCs browse only investment-ready startups and manage intro requests.",
+    technologies: ["React", "TypeScript", "Supabase", "Groq", "TailwindCSS", "Vite", "Vercel"],
+    problemSolved: "Founders struggle to reach the right investors while VCs drown in unvetted pitches — Motif adds a quality filter in between.",
+    architecture: [
+      "React 18 + TypeScript + Vite frontend styled with TailwindCSS",
+      "Supabase Auth (Google OAuth) and Postgres for profiles, startups and intro requests",
+      "Groq-hosted Llama 3.3 70B for idea scoring, market analysis and pitch tools",
+      "Five-role access control (super admin, admin, founder, VC, pending VC) with protected routes",
+    ],
+    highlights: [
+      "AI idea analysis & pitch creator",
+      "Draft → review → approved-for-VC pipeline",
+      "Live on Vercel",
+    ],
+  },
+  serina: {
+    name: "Serina",
+    featured: true,
+    category: "ai",
+    image: screenshot("serina", "docs/serina-ui.png"),
+    description: "Local-first voice AI assistant — offline Whisper speech-to-text, Llama 3 via Ollama and emotion-aware text-to-speech. Nothing leaves your machine.",
+    technologies: ["Python", "FastAPI", "React", "Whisper", "Ollama", "Llama 3", "SSE"],
+    highlights: [
+      "Whisper + Llama 3 run fully on-device",
+      "Replies voiced in 8 emotion profiles",
+      "Hands-free mode with voice-activity detection",
+      "Lighthouse accessibility 100/100",
+    ],
+  },
+  vaultwork: {
+    name: "Vaultwork",
+    featured: true,
+    category: "tool",
+    description: "Local-first productivity system — tasks, goals, habits and notes backed by an Obsidian vault, with a Tauri desktop app and a Claude MCP server.",
+    technologies: ["TypeScript", "React", "Tauri", "Rust", "IndexedDB", "Zustand", "MCP", "Vitest"],
+    highlights: [
+      "No backend, no account — data stays on device",
+      "Layered architecture enforced by lint and tests",
+      "Read-only MCP bridge for Claude Desktop",
+    ],
+  },
+  "Awaneesh-portfolio": {
     name: "macOS Portfolio",
-    description: "Interactive developer portfolio simulating the macOS desktop experience with draggable windows, dock magnification, and Spotlight search.",
-    longDescription: "A fully interactive portfolio that recreates the macOS experience in the browser. Features boot sequence, login screen, draggable windows with traffic lights, animated dock with magnification, Spotlight search, and multiple portfolio apps.",
-    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop",
-    technologies: ["React", "TypeScript", "TailwindCSS", "Framer Motion", "Vite"],
-    github: "https://github.com/Awaneesh03/MacOS-Recreation-main",
     featured: true,
     category: "web",
-    status: "completed",
+    description: "Interactive developer portfolio simulating the macOS desktop — draggable windows, dock magnification, Spotlight, terminal and a Gemini assistant.",
+    technologies: ["React", "TypeScript", "TailwindCSS", "Framer Motion", "Vite", "Gemini API"],
     highlights: [
       "Authentic macOS UI with glassmorphism",
-      "Spring-physics dock magnification",
-      "Full keyboard shortcut support",
-      "Live GitHub API integration"
-    ]
+      "Live GitHub API integration",
+    ],
   },
-
-  // Digital Life Dashboard
-  {
-    id: "digital-life-dashboard",
+  "digital-life-dashboard": {
     name: "Digital Life Dashboard",
-    description: "A personalized dashboard application for managing and visualizing daily digital life activities and metrics.",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop",
-    technologies: ["JavaScript", "HTML", "CSS", "Vercel"],
-    github: "https://github.com/Awaneesh03/digital-life-dashboard",
-    demo: "https://digital-life-dashboard-sepia.vercel.app",
     featured: true,
     category: "web",
-    status: "completed",
-    highlights: [
-      "Interactive dashboard UI",
-      "Real-time data visualization",
-      "Deployed on Vercel"
-    ]
+    technologies: ["JavaScript", "Supabase", "Chart.js"],
   },
-
-  // Weather App
-  {
-    id: "weather-app",
-    name: "Weather App",
-    description: "A weather application with beautiful UI showcasing current weather conditions and forecasts.",
-    image: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=800&auto=format&fit=crop",
-    technologies: ["JavaScript", "CSS", "HTML", "Weather API"],
-    github: "https://github.com/Awaneesh03/weather-app",
-    featured: false,
+  "rando-guess": {
+    name: "Rando Guess",
     category: "web",
-    status: "completed",
-    highlights: [
-      "API integration",
-      "Responsive design",
-      "Clean UI"
-    ]
+    description: "Cinematic crime-noir app that randomly assigns case files — canvas particle effects, glitch-text reveals and a procedural Web Audio soundtrack.",
+    technologies: ["JavaScript", "Canvas", "Web Audio API", "Vite"],
   },
-
-  // Harry Potter Website
-  {
-    id: "harry-potter-website",
-    name: "Harry Potter Fan Site",
-    description: "A fan-made Harry Potter website with elegant design inspired by the magical world of Hogwarts.",
-    image: "https://images.unsplash.com/photo-1551269901-5c5e14c25df7?w=800&auto=format&fit=crop",
-    technologies: ["HTML", "CSS", "JavaScript"],
-    github: "https://github.com/Awaneesh03/harry-potter-website",
-    featured: false,
-    category: "web",
-    status: "completed",
-    highlights: [
-      "Themed design",
-      "CSS animations",
-      "Interactive elements"
-    ]
-  },
-
-  // Treasure Hunt
-  {
-    id: "treasure-hunt",
-    name: "Treasure Hunt Game",
-    description: "An interactive treasure hunt game built with HTML and JavaScript.",
-    image: "https://images.unsplash.com/photo-1569003339405-ea396a5a8a90?w=800&auto=format&fit=crop",
-    technologies: ["HTML", "JavaScript", "CSS"],
-    github: "https://github.com/Awaneesh03/treasure-hunt",
-    featured: false,
-    category: "web",
-    status: "completed",
-    highlights: [
-      "Game logic implementation",
-      "Interactive UI"
-    ]
-  },
-
-  // Drum Kit
-  {
-    id: "drum-kit",
-    name: "Drum Kit",
-    description: "Interactive drum kit application with keyboard support and audio playback.",
-    image: "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=800&auto=format&fit=crop",
-    technologies: ["JavaScript", "HTML", "CSS", "Web Audio API"],
-    github: "https://github.com/Awaneesh03/drum-kit",
-    featured: false,
-    category: "web",
-    status: "completed",
-    highlights: [
-      "Keyboard event handling",
-      "Audio integration"
-    ]
-  },
-
-  // Pokemon Keyboard
-  {
-    id: "pokemon-keyboard",
-    name: "Pokemon Keyboard",
-    description: "A fun Pokemon-themed keyboard application with unique interactions.",
-    image: "https://images.unsplash.com/photo-1542779283-429940ce8336?w=800&auto=format&fit=crop",
-    technologies: ["JavaScript", "HTML", "CSS"],
-    github: "https://github.com/Awaneesh03/Pokemon-keyboard",
-    featured: false,
-    category: "web",
-    status: "completed",
-    highlights: [
-      "Pokemon theming",
-      "Keyboard interactions"
-    ]
-  },
-
-  // Hackathon Project
-  {
-    id: "hackathon",
-    name: "Hackathon Project",
-    description: "Project built during a hackathon event - rapid prototyping and development.",
-    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&auto=format&fit=crop",
-    technologies: ["HTML", "CSS", "JavaScript"],
-    github: "https://github.com/Awaneesh03/hackathon",
-    featured: false,
-    category: "web",
-    status: "completed",
-    highlights: [
-      "Rapid development",
-      "Hackathon experience"
-    ]
-  }
-];
-
-// Helper functions
-export const getStartupProject = (): FeaturedProject => {
-  return startupProject;
+  hackathon: { name: "CampusDash (Hackathon)" },
+  Dashboard: { name: "StudyFlow" },
+  "pokemon_game-": { name: "Pokémon Battle Game" },
+  "harry-potter-website": { name: "Harry Potter Fan Site" },
 };
 
-export const getFeaturedProjects = (): FeaturedProject[] => {
-  return featuredProjects.filter(p => p.featured);
-};
+// Coursework / profile repos kept out of the curated list.
+export const hiddenRepos = ["Awaneesh03", "sem2", "WebDev-sem3", "Machine-learning-", "Backend"];
 
-export const getProjectsByCategory = (category: FeaturedProject['category']): FeaturedProject[] => {
-  return featuredProjects.filter(p => p.category === category);
-};
+const prettify = (repoName: string) =>
+  repoName.replace(/[-_]+/g, " ").trim().replace(/\b\w/g, c => c.toUpperCase());
 
-export const getProjectCount = (): number => {
-  return featuredProjects.length;
-};
+const categoryFromTopics = (topics: string[]): FeaturedProject['category'] =>
+  topics.includes("game") ? "game"
+  : topics.some(t => ["ai", "machine-learning", "llm", "ollama"].includes(t)) ? "ai"
+  : "web";
 
-export const getCompletedProjectCount = (): number => {
-  return featuredProjects.filter(p => p.status === 'completed').length;
-};
+function toProject(name: string, repo?: GitHubRepo): FeaturedProject {
+  const topics = repo?.topics ?? [];
+  const base: FeaturedProject = {
+    id: name,
+    name: prettify(name),
+    // GitHub descriptions start with an emoji; the cards have their own icons.
+    description: (repo?.description ?? "").replace(/^\p{Extended_Pictographic}️?\s*/u, ""),
+    technologies: [repo?.language, ...topics].filter((t): t is string => !!t),
+    github: repo?.html_url ?? `https://github.com/${GITHUB_USERNAME}/${name}`,
+    demo: repo?.homepage || undefined,
+    featured: false,
+    category: categoryFromTopics(topics),
+    status: "completed",
+    updatedAt: repo?.pushed_at,
+  };
+  return { ...base, ...projectOverrides[name] };
+}
+
+const overrideOrder = Object.keys(projectOverrides);
+
+export function buildProjects(repos: GitHubRepo[]): FeaturedProject[] {
+  const visible = repos.filter(r => !r.fork && !r.archived && !hiddenRepos.includes(r.name));
+  const projects = visible.length
+    ? visible.map(r => toProject(r.name, r))
+    : overrideOrder.map(name => toProject(name));
+  const rank = (p: FeaturedProject) => (p.featured ? overrideOrder.indexOf(p.id) : overrideOrder.length);
+  return projects.sort((a, b) => rank(a) - rank(b) || (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""));
+}
+
+// Offline snapshot for places that render synchronously (terminal, widgets, Spotlight).
+export const featuredProjects: FeaturedProject[] = buildProjects([]);

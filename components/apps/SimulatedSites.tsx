@@ -20,12 +20,12 @@ export const SimulatedGitHub: React.FC<{ username?: string; query?: string }> = 
     const [activeTab, setActiveTab] = useState('repositories');
 
     const repos = [
-        { name: 'Awaneesh-portfolio', desc: 'macOS-style interactive developer portfolio built with React & TypeScript', lang: 'TypeScript', langColor: '#3178c6', stars: 2, forks: 0, updated: '2 days ago' },
-        { name: 'motif-website', desc: 'Full-stack web platform with TypeScript frontend and Java backend', lang: 'TypeScript', langColor: '#3178c6', stars: 1, forks: 0, updated: '1 week ago' },
-        { name: 'motif-backend-', desc: 'Java Spring Boot backend for Motif platform with REST APIs', lang: 'Java', langColor: '#b07219', stars: 0, forks: 0, updated: '2 weeks ago' },
-        { name: 'digital-life-dashboard', desc: 'Personal life dashboard with weather, tasks, and productivity tools', lang: 'JavaScript', langColor: '#f1e05a', stars: 1, forks: 0, updated: '3 weeks ago' },
-        { name: 'MacOS-Recreation-main', desc: 'Recreation of macOS desktop — open source portfolio project', lang: 'TypeScript', langColor: '#3178c6', stars: 0, forks: 0, updated: '1 month ago' },
-        { name: 'leetcode-solutions', desc: 'My solutions to LeetCode problems in Java and Python', lang: 'Java', langColor: '#b07219', stars: 0, forks: 0, updated: '1 month ago' },
+        { name: 'pacify', desc: 'Browser-based 3D multiplayer hide-and-seek horror game — Three.js + Socket.io', lang: 'TypeScript', langColor: '#3178c6', stars: 0, forks: 0, updated: 'this week' },
+        { name: 'serina', desc: 'Local-first voice AI assistant — offline Whisper, Llama 3 via Ollama, emotion-aware TTS', lang: 'JavaScript', langColor: '#f1e05a', stars: 0, forks: 0, updated: 'this week' },
+        { name: 'vaultwork', desc: 'Local-first productivity system — Obsidian vault, Tauri desktop app and a Claude MCP server', lang: 'TypeScript', langColor: '#3178c6', stars: 0, forks: 0, updated: 'this week' },
+        { name: 'motif-website', desc: 'AI-powered platform for founders to validate startup ideas and connect with VCs — React + Supabase + Groq', lang: 'TypeScript', langColor: '#3178c6', stars: 0, forks: 0, updated: 'this week' },
+        { name: 'Awaneesh-portfolio', desc: 'macOS-style interactive developer portfolio built with React & TypeScript', lang: 'TypeScript', langColor: '#3178c6', stars: 0, forks: 0, updated: 'this week' },
+        { name: 'digital-life-dashboard', desc: 'All-in-one personal dashboard — tasks, habits, expenses, budgets and goals', lang: 'JavaScript', langColor: '#f1e05a', stars: 0, forks: 0, updated: 'this week' },
     ];
 
     const tabs = [

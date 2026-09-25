@@ -1,6 +1,6 @@
 /**
  * Skills Configuration
- * Honest skill levels for a B.Tech freshman (2025)
+ * Honest skill levels for a B.Tech CSE (AI) student
  */
 
 export interface Skill {
@@ -25,10 +25,12 @@ export const skillCategories: SkillCategory[] = [
     skills: [
       { name: "HTML/CSS", level: 85, icon: "🌐", color: "#E34F26" },
       { name: "JavaScript", level: 75, icon: "⚡", color: "#F7DF1E" },
-      { name: "React", level: 70, icon: "⚛️", color: "#61DAFB" },
-      { name: "TypeScript", level: 65, icon: "🔷", color: "#3178C6" },
+      { name: "React", level: 75, icon: "⚛️", color: "#61DAFB" },
+      { name: "TypeScript", level: 70, icon: "🔷", color: "#3178C6" },
       { name: "TailwindCSS", level: 75, icon: "🎨", color: "#06B6D4" },
       { name: "Framer Motion", level: 60, icon: "✨", color: "#FF0055" },
+      { name: "Three.js", level: 50, icon: "🧊", color: "#049EF4" },
+      { name: "IndexedDB", level: 55, icon: "🗃️", color: "#1F6FEB" },
     ]
   },
   {
@@ -38,8 +40,11 @@ export const skillCategories: SkillCategory[] = [
     skills: [
       { name: "Java", level: 70, icon: "☕", color: "#ED8B00" },
       { name: "Node.js", level: 60, icon: "🟢", color: "#339933" },
-      { name: "Python", level: 55, icon: "🐍", color: "#3776AB" },
-      { name: "REST APIs", level: 65, icon: "🔗", color: "#FF6C37" },
+      { name: "Python", level: 60, icon: "🐍", color: "#3776AB" },
+      { name: "REST APIs", level: 70, icon: "🔗", color: "#FF6C37" },
+      { name: "FastAPI", level: 55, icon: "⚡", color: "#009688" },
+      { name: "Socket.io", level: 55, icon: "🔌", color: "#25C2A0" },
+      { name: "Supabase", level: 65, icon: "🟩", color: "#3ECF8E" },
       { name: "Spring Boot", level: 50, icon: "🍃", color: "#6DB33F" },
     ]
   },
@@ -53,6 +58,7 @@ export const skillCategories: SkillCategory[] = [
       { name: "Vercel", level: 70, icon: "▲", color: "#888888" },
       { name: "GitHub", level: 80, icon: "🐙", color: "#6E7681" },
       { name: "Linux", level: 50, icon: "🐧", color: "#FCC624" },
+      { name: "Tauri", level: 45, icon: "🦀", color: "#24C8D8" },
     ]
   },
   {
@@ -62,9 +68,9 @@ export const skillCategories: SkillCategory[] = [
     skills: [
       { name: "Data Structures", level: 60, icon: "🏗️", color: "#FF6B6B" },
       { name: "Algorithms", level: 55, icon: "🧮", color: "#4ECDC4" },
-      { name: "AI/ML Basics", level: 40, icon: "🤖", color: "#9B59B6" },
-      { name: "System Design", level: 35, icon: "📐", color: "#3498DB" },
-      { name: "Spring Boot", level: 50, icon: "🍃", color: "#6DB33F" },
+      { name: "AI/ML Basics", level: 45, icon: "🤖", color: "#9B59B6" },
+      { name: "Ollama / Llama 3", level: 50, icon: "🦙", color: "#A855F7" },
+      { name: "System Design", level: 40, icon: "📐", color: "#3498DB" },
     ]
   }
 ];
